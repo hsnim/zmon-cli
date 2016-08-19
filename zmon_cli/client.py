@@ -16,6 +16,8 @@ API_VERSION = 'v1'
 
 ZMON_USER_AGENT = 'zmon-client/{}'.format(__version__)
 
+ACTIVE_ALERT_DEF = 'checks/all-active-alert-definitions'
+ACTIVE_CHECK_DEF = 'checks/all-active-check-definitions'
 ALERT_DATA = 'status/alert'
 ALERT_DEF = 'alert-definitions'
 CHECK_DEF = 'check-definitions'
@@ -144,9 +146,15 @@ class Zmon:
 
         return urljoin(url, self._join_path(parts))
 
-    def json(self, resp):
+    def json(self, resp, key=None):
         resp.raise_for_status()
-        return resp.json()
+
+        j = resp.json()
+
+        if key:
+            return j.get(key)
+
+        return j
 
 ########################################################################################################################
 # DEEPLINKS
@@ -277,6 +285,12 @@ class Zmon:
         return self.json(resp)
 
     @logged
+    def get_check_definitions(self):
+        resp = self.session.get(self.endpoint(ACTIVE_CHECK_DEF))
+
+        return self.json(resp, key='check_definitions')
+
+    @logged
     def update_check_definition(self, check_definition):
         if 'owning_team' not in check_definition:
             raise ZmonArgumentError('Check definition must have "owning_team"')
@@ -307,6 +321,12 @@ class Zmon:
         resp = self.session.get(self.endpoint(ALERT_DEF, alert_id))
 
         return self.json(resp)
+
+    @logged
+    def get_alert_definitions(self):
+        resp = self.session.get(self.endpoint(ACTIVE_ALERT_DEF))
+
+        return self.json(resp, key='alert_definitions')
 
     @logged
     def create_alert_definition(self, alert_definition):

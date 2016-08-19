@@ -66,6 +66,37 @@ def get_alert_definition(obj, alert_id, output, pretty):
         act.echo(alert)
 
 
+@alert_definitions.command('list')
+@click.pass_obj
+@yaml_output_option
+@pretty_json
+def list_alert_definitions(obj, output, pretty):
+    """List all active alert definitions"""
+    client = get_client(obj.config)
+
+    with Output('Retrieving active alert definitions ...', nl=True, output=output, pretty_json=pretty) as act:
+        alerts = client.get_alert_definitions()
+        act.echo(alerts)
+
+
+@alert_definitions.command('filter')
+@click.argument('field')
+@click.argument('value')
+@click.pass_obj
+@yaml_output_option
+@pretty_json
+def filter_alert_definitions(obj, field, value, output, pretty):
+    """Filter active alert definitions"""
+    client = get_client(obj.config)
+
+    with Output('Retrieving and filtering alert definitions ...', nl=True, output=output, pretty_json=pretty) as act:
+        alerts = client.get_alert_definitions()
+
+        filtered = [alert for alert in alerts if alert.get(field) == value or value in alert.get(field, '')]
+
+        act.echo(filtered)
+
+
 @alert_definitions.command('create')
 @click.argument('yaml_file', type=click.File('rb'))
 @click.pass_obj
@@ -108,7 +139,7 @@ def update_alert_definition(obj, yaml_file):
 @click.argument('alert_id', type=int)
 @click.pass_obj
 def delete_alert_definition(obj, alert_id):
-    """Get a single alert definition"""
+    """Delete a single alert definition"""
     client = get_client(obj.config)
 
     with Action('Deleting alert definition ...'):
