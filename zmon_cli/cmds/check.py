@@ -86,7 +86,7 @@ def filter_check_definitions(obj, field, value, output, pretty):
     with Output('Retrieving and filtering check definitions ...', nl=True, output=output, pretty_json=pretty) as act:
         checks = client.get_check_definitions()
 
-        filtered = [check for check in checks if check.get(field) == value or value in check.get(field, '')]
+        filtered = [check for check in checks if check.get(field) == value]
 
         act.echo(filtered)
 

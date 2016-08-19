@@ -92,7 +92,7 @@ def filter_alert_definitions(obj, field, value, output, pretty):
     with Output('Retrieving and filtering alert definitions ...', nl=True, output=output, pretty_json=pretty) as act:
         alerts = client.get_alert_definitions()
 
-        filtered = [alert for alert in alerts if alert.get(field) == value or value in alert.get(field, '')]
+        filtered = [alert for alert in alerts if alert.get(field) == value]
 
         act.echo(filtered)
 
